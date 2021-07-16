@@ -6,6 +6,7 @@
             :center="center"
             @update:zoom="zoomUpdate"
             @update:center="centerUpdate"
+            :style="{ height: mapHeight }"
         >
             <v-icondefault></v-icondefault>
             <v-tilelayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"></v-tilelayer>
@@ -48,6 +49,7 @@ const API_ENDPOINT = `https://api.bitcoincash.site/v1`
 export default {
     props: {
         latlng: String,
+        isEmbedded: Boolean,
     },
     components: {
         // LMap,
@@ -83,15 +85,7 @@ export default {
                 zoomSnap: 0.5,
                 tap: false, // Safari fix (https://github.com/Leaflet/Leaflet/issues/7255)
             },
-
-            // vendors: [],
-            // isReady: `<pre>ready and waiting...</pre>`,
-            // mapSettings: {
-            //     defaultBaseMap: 'OpenStreetMap',
-            //     tap: false, // Safari fix (https://github.com/Leaflet/Leaflet/issues/7255)
-            //     center: DEFAULT_CENTER,
-            //     zoom: DEFAULT_ZOOM,
-            // },
+            tap: false, // Safari fix (https://github.com/Leaflet/Leaflet/issues/7255)
 
             moveTimer: null,
             vendors: null,
@@ -108,7 +102,51 @@ export default {
             this.map.setView({ lat, lng }, 12)
         },
     },
+    computed: {
+        mapHeight() {
+            if (this.isEmbedded) {
+                return 'calc(100vh - 18px)'
+            } else {
+                return '500px'
+            }
+        },
+    },
     methods: {
+        init() {
+            /* Initialize map object. */
+            this.map = this.$refs.map.mapObject
+
+            // console.log('LATLNG', this.latlng)
+
+            /* Auto locate current position. */
+            if (this.latlng) {
+                const lat = this.latlng.split(',')[0]
+                const lng = this.latlng.split(',')[1]
+
+                this.map.setView({ lat, lng }, 12)
+            } else {
+                    // this.map.locate({ setView: true, watch: true })
+                    this.map.locate()
+                        .on('locationfound', (e) => {
+                            // console.log('LOCATION FOUND (e):', e)
+
+                            /* Set latitude. */
+                            const lat = e.latitude
+
+                            /* Set longitude. */
+                            const lng = e.longitude
+
+                            /* Set map view. */
+                            this.map.setView({ lat, lng }, 12)
+                        })
+                       .on('locationerror', (e) => {
+                            console.log('LOCATION ERROR (e):', e)
+                            // alert('Location access denied.')
+                        })
+
+            }
+
+        },
         getIcon(_category) {
             switch(_category) {
             case 'atm':
@@ -169,7 +207,7 @@ export default {
             }
 
             const pkg = {
-                // cat: 'atm',
+                cat: 'atm',
                 bounds,
             }
             // console.log('PKG', pkg);
@@ -261,30 +299,14 @@ export default {
                             }
                             // console.log('DETAILS', details);
 
-                            // console.log('VENDOR SOURCE CAT', vendor._source.category);
-                            // if (vendor._source.category === 'atm') {
-                            //     this.vendors.push({
-                            //         id: vendor._source.id,
-                            //         lat: vendor._source.lat,
-                            //         lng: vendor._source.lon,
-                            //         latlng: [ vendor._source.lat, vendor._source.lon ],
-                            //         icon: icon({
-                            //             iconUrl: require('@/assets/atm.png'),
-                            //             iconSize: [32, 32],
-                            //             iconAnchor: [16, 37]
-                            //         }),
-                            //         text: details,
-                            //     })
-                            // } else {
-                                this.vendors.push({
-                                    id: vendor._source.id,
-                                    cat: vendor._source.category,
-                                    lat: vendor._source.lat,
-                                    lng: vendor._source.lon,
-                                    latlng: [ vendor._source.lat, vendor._source.lon ],
-                                    details,
-                                })
-                            // }
+                            this.vendors.push({
+                                id: vendor._source.id,
+                                cat: vendor._source.category,
+                                lat: vendor._source.lat,
+                                lng: vendor._source.lon,
+                                latlng: [ vendor._source.lat, vendor._source.lon ],
+                                details,
+                            })
 
                         })
                         // this.vendors = body
@@ -297,11 +319,18 @@ export default {
          * Inner Click
          */
         innerClick() {
-            alert('Inner Click!')
+            console.log('Inner Click!')
         },
 
-        click: (e) => console.log("clusterclick", e),
-        ready: (e) => console.log('ready', e),
+        click() {
+            console.log('CLUSTER CLICK')
+        },
+
+        ready(e) {
+            console.log('MAP IS READY', e)
+
+            // this.map = e._map
+        },
 
     },
     created: function () {
@@ -309,28 +338,9 @@ export default {
         this.vendors = []
     },
     mounted: function () {
+        // NOTE: Wait for map object to become available
         this.$nextTick(() => {
-            this.map = this.$refs.map.mapObject
-
-            // this.map.locate({ setView: true, watch: true })
-            this.map.locate()
-                .on('locationfound', (e) => {
-                    // console.log('LOCATION FOUND (e):', e)
-
-                    /* Set latitude. */
-                    const lat = e.latitude
-
-                    /* Set longitude. */
-                    const lng = e.longitude
-
-                    /* Set map view. */
-                    this.map.setView({ lat, lng }, 12)
-                })
-               .on('locationerror', (e) => {
-                    console.log('LOCATION ERROR (e):', e)
-                    // alert('Location access denied.')
-                })
-
+            this.init()
         })
 
     },
@@ -356,6 +366,6 @@ export default {
 
 main {
     width: 100%;
-    height: 500px;
+    /* height: 500px; */
 }
 </style>

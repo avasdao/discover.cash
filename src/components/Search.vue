@@ -9,7 +9,12 @@
         />
 
         <ul v-if="filteredSuggestions" class="suggestions">
-            <li v-for="(suggestion, index) of filteredSuggestions" :key="suggestion" :class="{ 'suggestion-active': index === activeSuggestion }" @click="onClick(suggestion)">
+            <li
+                v-for="(suggestion, index) of filteredSuggestions"
+                :key="suggestion"
+                :class="{ 'suggestion-active': index === activeSuggestion }"
+                @click="onClick(suggestion)"
+            >
                 {{suggestion}}
             </li>
         </ul>
@@ -32,7 +37,6 @@ export default {
         return {
             activeSuggestion: null,
             filteredSuggestions: null,
-            // showSuggestions: null,
             suggestions: null,
             userInput: null,
         }
@@ -67,7 +71,6 @@ export default {
             /* Update state. */
             this.activeSuggestion = 0
             this.filteredSuggestions = filteredSuggestions
-            // this.showSuggestions = true
 
         },
 
@@ -77,8 +80,6 @@ export default {
         onChange() {
             /* Validate user input. */
             if (this.userInput.length < 3) {
-                // return this.props.onChange(userInput)
-                // this.props.onChange(userInput)
                 this.$emit('onChange', this.userInput)
             } else {
                 /* Request suggestions. */
@@ -95,7 +96,13 @@ export default {
             })
 
             const vendor = vendors.find(vendor => {
-                return vendor.name === _suggestion
+                if (vendor.name) {
+                    return vendor.name === _suggestion
+                } else if (vendor.companyName) {
+                    return vendor.companyName === _suggestion
+                } else {
+                    return null
+                }
             })
 
             /* Emit selection. */
@@ -117,7 +124,6 @@ export default {
             // console.log('ONKEYDOWN', this.activeSuggestion, e);
             if (e.keyCode === 13) { // pressed the enter key
                 this.activeSuggestion = 0
-                // this.showSuggestions = false
                 this.userInput = this.filteredSuggestions[this.activeSuggestion]
 
                 /* Emit selection. */
@@ -147,7 +153,6 @@ export default {
         /* Initialize state. */
         this.activeSuggestion = 0
         this.filteredSuggestions = []
-        // this.showSuggestions = false
         this.userInput = ''
 
     },

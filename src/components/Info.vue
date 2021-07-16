@@ -5,7 +5,7 @@
         </div>
 
         <div>
-            <a href="https://github.com/Panmoni/discover-cash" target="_blank">Source</a> maintained by <a href="https://modenero.com" target="_blank">Modenero</a>.
+            <a href="https://github.com/Panmoni/discover-cash" target="_blank">Source</a> maintained by <a href="https://modenero.com" target="_blank">Modenero</a>
         </div>
     </main>
 </template>

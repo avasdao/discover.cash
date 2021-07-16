@@ -1,30 +1,44 @@
 <template>
     <main>
-        <div class="vendor-results" v-for="vendor of activeVendors" :key="vendor.id">
+        <div
+            v-for="vendor of activeVendors"
+            :key="vendor.id"
+            class="vendor-results"
+        >
 
-            <h3>{{vendor.name}}</h3>
+            <h3>{{vendor.name || vendor.companyName}}</h3>
 
-            <div v-if="vendor.description" class="vendor-results-description">{{vendor.description}}</div>
-
-            <h3 v-if="vendor.companyName">{{vendor.companyName}}</h3>
-
-            <div v-if="vendor.type">Type: {{vendor.type}}</div>
-
-            <div v-if="vendor.category">
-                Category: {{vendor.category === 'default' ? 'general' : vendor.category}}
+            <div v-if="vendor.description" class="vendor-results-description">
+                {{vendor.description}}
             </div>
 
-            <div v-if="vendor.streetAddress">Address: {{vendor.streetAddress}}</div>
+            <div v-if="vendor.type">
+                Type: {{displayType(vendor)}}
+            </div>
 
-            <div v-if="vendor.houseno && vendor.street">Address: {{vendor.houseno}} {{vendor.street}}</div>
+            <div v-if="vendor.category">
+                Category: {{displayCategory(vendor)}}
+            </div>
 
-            <div v-if="vendor.neighborhood">Neighborhood: {{vendor.neighborhood}}</div>
+            <div v-if="vendor.streetAddress">
+                Address: {{vendor.streetAddress}}
+            </div>
+
+            <div v-if="vendor.houseno && vendor.street">
+                Address: {{vendor.houseno}} {{vendor.street}}
+            </div>
+
+            <div v-if="vendor.neighborhood">
+                Neighborhood: {{vendor.neighborhood}}
+            </div>
 
             <div v-if="vendor.city && vendor.state && vendor.country">
                 {{vendor.city}}, {{vendor.state}}, {{vendor.country}}
             </div>
 
-            <div v-if="vendor.phone">Phone: {{vendor.phone}}</div>
+            <div v-if="vendor.phone">
+                Phone: {{vendor.phone}}
+            </div>
 
             <div v-if="vendor.website">
                 <a :href="vendor.website" target="_blank">{{vendor.website}}</a>
@@ -34,7 +48,9 @@
                 <a :href="vendor.googleBusiness" target="_blank">Google Business (link)</a>
             </div>
 
-            <div v-if="vendor.opening_hours">{{vendor.opening_hours}}</div>
+            <div v-if="vendor.opening_hours">
+                {{vendor.opening_hours}}
+            </div>
 
         </div>
 
@@ -107,7 +123,8 @@ export default {
             // })
 
             return active
-        }
+        },
+
     },
     methods: {
         showMoreEntries() {
@@ -127,6 +144,26 @@ export default {
             this.resultsRemaining = this.vendors.length - this.numDisplayed
         },
 
+        displayType(_vendor) {
+            if (Array.isArray(_vendor.type)) {
+                return _vendor.type[0]
+            } else {
+                return _vendor.type
+            }
+        },
+
+        displayCategory(_vendor) {
+            if (_vendor.category === 'default') {
+                return 'General'
+            } else if (_vendor.category === 'atm') {
+                return 'ATM'
+            } else if (Array.isArray(_vendor.category)) {
+                return _vendor.category[0]
+            } else {
+                return _vendor.category
+            }
+        },
+
     },
     created: function () {
         this.numDisplayed = ENTRIES_PER_PAGE
@@ -134,7 +171,7 @@ export default {
         this.resultsRemaining = 0
     },
     mounted: function () {
-
+        //
     },
 }
 </script>

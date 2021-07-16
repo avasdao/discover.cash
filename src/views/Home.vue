@@ -1,9 +1,9 @@
 <template>
     <main>
-        <Map @onUpdate="handleUpdate" :latlng="lat + ',' + lng" />
+        <Map @onUpdate="handleUpdate" :latlng="latlng" :isEmbedded="isEmbedded" />
         <Info />
-        <Search @onChange="handleChange" @onSelect="handleSelect" />
-        <Results :vendors="vendors" />
+        <Search v-if="!isEmbedded" @onChange="handleChange" @onSelect="handleSelect" />
+        <Results v-if="!isEmbedded" :vendors="vendors" />
     </main>
 </template>
 
@@ -27,77 +27,70 @@ export default {
             vendors: null,
             lat: null,
             lng: null,
+            isEmbedded: null,
         }
     },
+    computed: {
+        latlng() {
+            if (!this.lat || !this.lng) {
+                return null
+            }
+
+            return this.lat + ',' + this.lng
+        },
+    },
     methods: {
+        init() {
+            const query = this.$route.query
+            // console.log('QUERY', query)
+
+            /* Handle embedded map. */
+            if (query && typeof query.embed !== 'undefined') {
+                this.isEmbedded = true
+            }
+
+            /* Handle latitude / longitude view. */
+            if (query && query.latlng) {
+                this.lat = query.latlng.split(',')[0]
+                this.lng = query.latlng.split(',')[1]
+            }
+
+            /* Handle latitude / longitude view. */
+            if (query && query.lat && query.lng) {
+                this.lat = query.lat
+                this.lng = query.lng
+            }
+
+            /* Handle latitude / longitude view. */
+            if (query && query.lat && query.lon) {
+                this.lat = query.lat
+                this.lng = query.lon
+            }
+
+        },
+
         /**
          * Change Handler
          */
         handleChange(_userInput) {
             console.log('HANDLE CHANGE (userInput):', _userInput)
-
-            // /* Set query. */
-            // const query = _userInput
-            //
-            // /* Validate query. */
-            // if (query.length === 1 || query.length === 2) {
-            //     /* Set state. */
-            //     setState({
-            //         ...state,
-            //         vendors: [],
-            //         isReady: `<pre>enter at least 3 characters to begin search</pre>`,
-            //     })
-            // } else if (query.length >= 3) {
-            //     /* Request merchants. */
-            //     const merchants = await fetch
-            //         // (`${API_ENDPOINT}/search/merchants/${query}`)
-            //         (`${API_ENDPOINT}/search/${query}`)
-            //         .catch(err => console.error)
-            //
-            //     /* Set vendors. */
-            //     const vendors = await merchants
-            //         .json()
-            //         .catch(err => console.error)
-            //     console.log('handleKeyUp.vendors:', vendors)
-            //
-            //     /* Initialize isReady flag. */
-            //     let isReady
-            //
-            //     /* Validate vendors. */
-            //     if (vendors.length === 0) {
-            //         isReady = `<pre>No results found. Please try again.</pre>`
-            //     } else {
-            //         isReady = null
-            //     }
-            //
-            //     /* Set state. */
-            //     setState({
-            //         ...state,
-            //         vendors,
-            //         isReady,
-            //     })
-            // } else {
-            //     /* Set state. */
-            //     setState({
-            //         ...state,
-            //         vendors: [],
-            //         isReady: `<pre>ready and waiting...</pre>`,
-            //     })
-            // }
-
         },
 
         /**
          * Selection Handler
          */
         handleSelect(_selected) {
-            // console.log('HANDLE SELECT (selected):', _selected)
+            console.log('HANDLE SELECT (selected):', _selected)
 
-            this.suggestion = _selected.suggestion
-            // console.log('HANDLING (suggestion):', this.suggestion)
+            if (_selected) {
+                this.suggestion = _selected.suggestion
+                // console.log('HANDLING (suggestion):', this.suggestion)
 
-            this.lat = _selected.vendor.lat
-            this.lng = _selected.vendor.lon
+                if (_selected.vendor) {
+                    this.lat = _selected.vendor.lat
+                    this.lng = _selected.vendor.lon
+                }
+            }
         },
 
         /**
@@ -120,6 +113,10 @@ export default {
     created: function () {
         /* Initialize vendors. */
         this.vendors = []
+
+        this.isEmbedded = false
+
+        this.init()
     },
     mounted: function () {
         //
