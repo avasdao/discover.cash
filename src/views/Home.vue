@@ -1,6 +1,6 @@
 <template>
     <main>
-        <Map @onUpdate="handleUpdate" :latlng="latlng" :isEmbedded="isEmbedded" />
+        <Map @onUpdate="handleUpdate" :startPos="latlng" :startZoom="zoom" :isEmbedded="isEmbedded" />
         <Info />
         <Search v-if="!isEmbedded" @onChange="handleChange" @onSelect="handleSelect" />
         <Results v-if="!isEmbedded" :vendors="vendors" />
@@ -25,8 +25,11 @@ export default {
         return {
             suggestion: null,
             vendors: null,
+
             lat: null,
             lng: null,
+            zoom: null,
+
             isEmbedded: null,
         }
     },
@@ -65,6 +68,16 @@ export default {
             if (query && query.lat && query.lon) {
                 this.lat = query.lat
                 this.lng = query.lon
+            }
+
+            /* Handle zoom. */
+            if (query && query.zoom) {
+                this.zoom = query.zoom
+            }
+
+            /* Handle zoom. */
+            if (query && query.z) {
+                this.zoom = query.z
             }
 
         },

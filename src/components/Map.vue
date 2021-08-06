@@ -2,14 +2,15 @@
     <main>
         <v-map
             ref="map"
+            :style="{ height: mapHeight }"
             :zoom="zoom"
             :center="center"
+            :options="mapOptions"
             @update:zoom="zoomUpdate"
             @update:center="centerUpdate"
-            :style="{ height: mapHeight }"
         >
             <v-icondefault></v-icondefault>
-            <v-tilelayer url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"></v-tilelayer>
+            <v-tilelayer url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"></v-tilelayer>
             <v-marker-cluster :options="clusterOptions" @clusterclick="click()" @ready="ready">
                 <v-marker v-for="vendor in vendors" :key="vendor.id" :lat-lng="vendor.latlng" :icon="getIcon(vendor.cat)">
                     <v-popup :content="vendor.details"></v-popup>
@@ -48,14 +49,11 @@ const API_ENDPOINT = `https://api.bitcoincash.site/v1`
 
 export default {
     props: {
-        latlng: String,
+        startPos: String,
+        startZoom: Number,
         isEmbedded: Boolean,
     },
     components: {
-        // LMap,
-        // LTileLayer,
-        // LMarker,
-        // LPopup,
         'v-map': LMap,
         'v-tilelayer': LTileLayer,
         'v-icondefault': LIconDefault,
@@ -69,13 +67,9 @@ export default {
 
             url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             attribution:
-                '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+                '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
 
-            withPopup: DEFAULT_CENTER,
-            currentZoom: 11.5,
-            currentCenter: DEFAULT_CENTER,
-
-            zoom: 13,
+            zoom: null,
             center: DEFAULT_CENTER,
             bounds: null,
             mapOptions: {
@@ -85,7 +79,6 @@ export default {
                 zoomSnap: 0.5,
                 tap: false, // Safari fix (https://github.com/Leaflet/Leaflet/issues/7255)
             },
-            tap: false, // Safari fix (https://github.com/Leaflet/Leaflet/issues/7255)
 
             moveTimer: null,
             vendors: null,
@@ -93,7 +86,7 @@ export default {
         }
     },
     watch: {
-        latlng: function (_latlng) {
+        startPos: function (_latlng) {
             // console.log('I JUST SAW THE COORDS CHANGE:', _latlng)
 
             const lat = _latlng.split(',')[0]
@@ -116,14 +109,14 @@ export default {
             /* Initialize map object. */
             this.map = this.$refs.map.mapObject
 
-            // console.log('LATLNG', this.latlng)
+            // console.log('START POS', this.startPos)
 
             /* Auto locate current position. */
-            if (this.latlng) {
-                const lat = this.latlng.split(',')[0]
-                const lng = this.latlng.split(',')[1]
+            if (this.startPos) {
+                const lat = this.startPos.split(',')[0]
+                const lng = this.startPos.split(',')[1]
 
-                this.map.setView({ lat, lng }, 12)
+                this.map.setView({ lat, lng }, this.startZoom)
             } else {
                     // this.map.locate({ setView: true, watch: true })
                     this.map.locate()
@@ -142,6 +135,16 @@ export default {
                        .on('locationerror', (e) => {
                             console.log('LOCATION ERROR (e):', e)
                             // alert('Location access denied.')
+
+                            /* Set latitude. */
+                            const lat = '10.4965916' // default to Bitcoin Café Venezuela
+
+                            /* Set longitude. */
+                            const lng = '-66.8365339' // default to Bitcoin Café Venezuela
+
+                            /* Set map view. */
+                            this.map.setView({ lat, lng }, 12)
+                            console.info('Loading default location: Bitcoin Café Venezuela')
                         })
 
             }
@@ -336,13 +339,12 @@ export default {
     created: function () {
         /* Initialize vendors. */
         this.vendors = []
+
+        this.zoom = this.startZoom
     },
     mounted: function () {
         // NOTE: Wait for map object to become available
-        this.$nextTick(() => {
-            this.init()
-        })
-
+        this.$nextTick(this.init)
     },
 }
 </script>
