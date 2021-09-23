@@ -10,7 +10,7 @@
 <script>
 /* Import components. */
 import Info from '@/components/Info.vue'
-import Map from '@/components/Map.vue'
+import Map from '@/components/Mapbox.vue'
 import Results from '@/components/Results.vue'
 import Search from '@/components/Search.vue'
 
@@ -136,7 +136,3 @@ export default {
     },
 }
 </script>
-
-<style scoped>
-/*  */
-</style>

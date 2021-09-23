@@ -4,6 +4,9 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
+/* Import tailwind. */
+import 'tailwindcss/tailwind.css'
+
 /* Import Leaflet styles. */
 import 'leaflet/dist/leaflet.css'
 

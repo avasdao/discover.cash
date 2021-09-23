@@ -29,7 +29,7 @@
 /* Import modules. */
 import superagent from 'superagent'
 
-const API_ENDPOINT = `https://api.bitcoincash.site/v1`
+const API_ENDPOINT = `https://api.panmoni.com/v1`
 // const API_ENDPOINT = `http://localhost:8080/v1`
 
 export default {
