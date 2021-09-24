@@ -88,6 +88,12 @@ export default {
 
             this.map.addControl(new Mapbox.FullscreenControl())
 
+            this.map.addControl(new Mapbox.NavigationControl({
+                showCompass: true,
+                showZoom: true,
+                visualizePitch: false,
+            }))
+
             this.map.on('load', () => {
 
                 this.addMarkers()
@@ -135,15 +141,36 @@ export default {
         },
 
         addMarkers() {
+            const marker_atm = document.createElement('div')
+            marker_atm.id = 'marker-atm'
+
             // make a marker for each feature and add to the map
-            new Mapbox.Marker()
-                .setLngLat([ -66.888721, 10.505399 ])
-                .addTo(this.map)
+            new Mapbox.Marker(marker_atm)
+            .setLngLat([ -66.888721, 10.505399 ])
+            .addTo(this.map)
 
-            new Mapbox.Marker()
-                .setLngLat([ -66.858721, 10.495399 ])
-                .addTo(this.map)
+            new Mapbox.Marker({
+                color: '#CC3939',
+                draggable: true,
+            })
+            .setLngLat([ -66.858721, 10.495399 ])
+            .addTo(this.map)
 
+            const html = `
+<h1 class="text-2xl font-bold text-red-300">Hello World!</h1>
+`
+
+            const popup = new Mapbox.Popup({ offset: 40 })
+                .setHTML(html)
+                .setMaxWidth('300px')
+
+            new Mapbox.Marker({
+                color: '#39CC39',
+                draggable: false,
+            })
+                .setLngLat([ -66.918721, 10.505399 ])
+                .setPopup(popup)
+                .addTo(this.map)
         },
 
     },
@@ -162,3 +189,13 @@ export default {
     },
 }
 </script>
+
+<style>
+#marker-atm {
+    background-image: url('../assets/atm.png');
+    background-size: cover;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+}
+</style>
