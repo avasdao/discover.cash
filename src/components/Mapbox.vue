@@ -71,7 +71,8 @@ export default {
                 style: 'mapbox://styles/mapbox/streets-v11',
                 // center: [ 103.811279, 1.345399 ],
                 // center: [ 40.7579747, -73.9877366 ],
-                center: [ -73.9877366, 40.7579747 ],
+                center: [ -66.888721, 10.505399 ],
+                // center: [ -73.9877366, 40.7579747 ],
                 zoom: 12,
                 // maxBounds: [
                 //     [ 40.558896, -74.185130 ],
@@ -85,6 +86,15 @@ export default {
 
             /* Initialize map object. */
             this.map = new Mapbox.Map(config)
+
+            // make a marker for each feature and add to the map
+            new Mapbox.Marker()
+                .setLngLat(config.center)
+                .addTo(this.map)
+
+            new Mapbox.Marker()
+                .setLngLat([ -66.858721, 10.495399 ])
+                .addTo(this.map)
 
         },
 
