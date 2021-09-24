@@ -1,6 +1,8 @@
 <template>
     <main>
-        <div id="mapContainer" class="w-full h-96"></div>
+        <div id="map" class="w-full h-96">
+            <!-- Mapbox container. -->
+        </div>
     </main>
 </template>
 
@@ -8,7 +10,7 @@
 <script>
 import Mapbox from 'mapbox-gl'
 
-// const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibW9kZW5lcm8iLCJhIjoiY2t0eGI3NGF1MnJzdDJ3cHFhZzlmMWprZCJ9.3QRaaXo16d1-PjgoRgGu-A' // prod
+// const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibW9kZW5lcm8iLCJhIjoiY2t0eHAxY2JjMDh3MTJ0b3FleGdhYWk4bSJ9.2WOkhBYSiCSd6mW74ocbcQ' // prod
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibW9kZW5lcm8iLCJhIjoiY2tza3hsazR0MGVkazJ2dGVwOXhpaDkzeiJ9.Ogmv-xLwll3Z_1uuCItolg' // localhost
 
 export default {
@@ -18,10 +20,7 @@ export default {
         isEmbedded: Boolean,
     },
     components: {
-        // LMap,
-        // LTileLayer,
-        // LMarker,
-        // LPopup,
+        //
     },
     watch: {
         // startPos: function (_latlng) {
@@ -67,7 +66,7 @@ export default {
             // this.map = this.$refs.map.mapObject
 
             const config = {
-                container: 'mapContainer',
+                container: 'map',
                 style: 'mapbox://styles/mapbox/streets-v11',
                 // center: [ 103.811279, 1.345399 ],
                 // center: [ 40.7579747, -73.9877366 ],
@@ -87,15 +86,39 @@ export default {
             /* Initialize map object. */
             this.map = new Mapbox.Map(config)
 
-            // make a marker for each feature and add to the map
-            new Mapbox.Marker()
-                .setLngLat(config.center)
-                .addTo(this.map)
+            this.map.addControl(new Mapbox.FullscreenControl())
 
-            new Mapbox.Marker()
-                .setLngLat([ -66.858721, 10.495399 ])
-                .addTo(this.map)
+            this.map.on('load', () => {
 
+                this.addMarkers()
+
+                // this.map.addLayer({
+                //     id: 'terrain-data',
+                //     type: 'line',
+                //     source: {
+                //         type: 'vector',
+                //         url: 'mapbox://mapbox.mapbox-terrain-v2'
+                //     },
+                //     'source-layer': 'contour'
+                // })
+
+                // this.map.addLayer({
+                //         id: 'rpd_parks',
+                //         type: 'fill',
+                //         source: {
+                //             type: 'vector',
+                //             url: 'mapbox://mapbox.3o7ubwm8'
+                //         },
+                //         'source-layer': 'RPD_Parks',
+                //         layout: {
+                //             visibility: 'visible'
+                //         },
+                //         paint: {
+                //             'fill-color': 'rgba(61,153,80,0.55)'
+                //         }
+                //     })
+
+            })
         },
 
         zoomUpdate(_zoom) {
@@ -109,7 +132,20 @@ export default {
         innerClick() {
 
             alert(`Click!`)
-        }
+        },
+
+        addMarkers() {
+            // make a marker for each feature and add to the map
+            new Mapbox.Marker()
+                .setLngLat([ -66.888721, 10.505399 ])
+                .addTo(this.map)
+
+            new Mapbox.Marker()
+                .setLngLat([ -66.858721, 10.495399 ])
+                .addTo(this.map)
+
+        },
+
     },
     created: function () {
         //
