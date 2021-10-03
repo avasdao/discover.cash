@@ -44,7 +44,7 @@ const DEFAULT_CENTER = latLng(40.758896, -73.985130)
 /* Set default zoom level. */
 const DEFAULT_ZOOM = 10
 
-const API_ENDPOINT = `https://api.bitcoincash.site/v1`
+const API_ENDPOINT = `https://api.panmoni.com/v1`
 // const API_ENDPOINT = `http://localhost:8080/v1`
 
 export default {
