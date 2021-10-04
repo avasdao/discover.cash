@@ -81,21 +81,23 @@ export default {
                 visualizePitch: false,
             }))
 
-            this.map.addControl(new Mapbox.GeolocateControl({
-                positionOptions: {
-                    enableHighAccuracy: true
-                },
-                trackUserLocation: true,
-                showUserHeading: true,
-            }))
+            /* Add geolocator control. */
+            // this.map.addControl(new Mapbox.GeolocateControl({
+            //     positionOptions: {
+            //         enableHighAccuracy: true
+            //     },
+            //     trackUserLocation: true,
+            //     showUserHeading: true,
+            // }))
 
+            /* Handle map movement. */
             this.map.on('moveend', async () => {
+                /* Manage map. */
                 this.mapManager()
             })
 
             /* Handle loaded map. */
             this.map.on('load', async () => {
-
                 // When a click event occurs on a feature in the places layer, open a popup at the
                 // location of the feature, with description HTML from its properties.
                 // this.map.on('click', 'places', (e) => {
@@ -111,6 +113,7 @@ export default {
                         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
                     }
 
+                    /* Add popup. */
                     new Mapbox.Popup({
                         className: 'mapbox-popup',
                         maxWidth: '320px',
@@ -166,6 +169,8 @@ export default {
                     this.map.getCanvas().style.cursor = ''
                 })
 
+                /* Manage map. */
+                this.mapManager()
             })
         },
 
@@ -184,6 +189,12 @@ export default {
             alert(`Click!`)
         },
 
+        /**
+         * Manage Map
+         *
+         * Determine the map area and request the relevant data from the
+         * remote API.
+         */
         async mapManager() {
             // console.log('MAP MOVED')
 
@@ -303,6 +314,7 @@ export default {
                 /* Initialize features. */
                 const features = []
 
+                /* Handle vendors. */
                 this.vendors.forEach(_vendor => {
                     /* Set feature. */
                     const feature = {
@@ -316,20 +328,27 @@ export default {
                         }
                     }
 
+                    /* Add feature. */
                     features.push(feature)
                 })
 
+                /* Build GeoJSON data. */
                 const data = {
                     'type': 'FeatureCollection',
                     features,
                 }
 
+                /* Update map data. */
                 this.updateMap(data)
-
             }
 
         },
 
+        /**
+         * Update Map
+         *
+         * Set map sources, markers and layers.
+         */
         updateMap(_data) {
             // const bounds = this.map.getBounds()
             // console.log('BOUNDS', bounds)
@@ -339,25 +358,39 @@ export default {
 
             /* Validate source. */
             if (source) {
-                console.info('Updating map..', _data)
+                // console.info('Updating map..', _data)
 
-                /* Remove (existing) source. */
-                // return source.data = _data
+                /* Update map data. */
                 return source.setData(_data)
-            } else {
-                console.log('Initiating new source..', _data)
             }
+
+            /* Set map type. */
+            const type = 'geojson'
+
+            /* Set data. */
+            const data = _data
+
+            /* Set cluster (flag). */
+            const cluster = true
+
+            /* Set cluster maximum zoom. */
+            // NOTE: Max zoom to cluster points on.
+            const clusterMaxZoom = 14
+
+            /* Set cluster radius. */
+            // NOTE: Radius of each cluster when clustering points (defaults to 50).
+            const clusterRadius = 50
 
             /* Add (new) source. */
             this.map.addSource('places', {
                 // This GeoJSON contains features that include an "icon"
                 // property. The value of the "icon" property corresponds
                 // to an image in the Mapbox Streets style's sprite.
-                type: 'geojson',
-                data: _data,
-                cluster: true,
-                clusterMaxZoom: 14, // Max zoom to cluster points on
-                clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
+                type,
+                data,
+                cluster,
+                clusterMaxZoom,
+                clusterRadius,
             })
 
             // Add a layer showing the places.
