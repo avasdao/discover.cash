@@ -27,65 +27,45 @@ export default {
         //
     },
     watch: {
-        // startPos: function (_latlng) {
-        //     console.log('I JUST SAW THE COORDS CHANGE:', _latlng)
-        //
-        //     const lat = _latlng.split(',')[0]
-        //     const lng = _latlng.split(',')[1]
-        //
-        //     this.map.setView({ lat, lng }, 12)
-        // },
+        startPos: function (_latlng) {
+            console.log('I JUST SAW THE COORDS CHANGE:', _latlng)
+
+            /* Set latitude. */
+            const lat = _latlng.split(',')[0]
+
+            /* Set longitude. */
+            const lng = _latlng.split(',')[1]
+
+            /* Set center. */
+            const center = [ lng, lat ]
+
+            /* Set map center. */
+            this.map.setCenter(center)
+
+            /* Request zoom. */
+            // const zoom = this.map.getZoom()
+
+            // this.map.easeTo({
+            //     center,
+            //     zoom,
+            // })
+
+        },
     },
     data() {
         return {
-            accessToken: MAPBOX_ACCESS_TOKEN,
             map: null,
             vendors: null,
-
-            // LEGACY
-
-            // map: null,
-            //
-            // zoom: 15,
-            // currentZoom: null,
-            //
-            // center: latLng(LOCATION.lat, LOCATION.lng),
-            // currentCenter: latLng(LOCATION.lat, LOCATION.lng),
-            //
-            // url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            // attribution:
-            //     '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a>',
-            //
-            // withPopup: latLng(40.7244012, -73.997503),
-            // withTooltip: latLng(40.7253863, -73.9897977),
-            //
-            // mapOptions: {
-            //     zoomSnap: 1.0
-            // },
-            // showMap: true
-        };
+        }
     },
     methods: {
-        init() {
-            /* Initialize map object. */
-            // this.map = this.$refs.map.mapObject
-
+        init(_center, _zoom) {
+            /* Set configuration. */
             const config = {
                 container: 'map',
                 style: 'mapbox://styles/mapbox/streets-v11',
-                // center: [ 103.811279, 1.345399 ],
-                // center: [ 40.7579747, -73.9877366 ],
-                center: [ -66.888721, 10.505399 ],
-                // center: [ -77.04, 38.907 ],
-                zoom: 12,
-                // maxBounds: [
-                //     [ 40.558896, -74.185130 ],
-                //     [ 40.958896, -73.785130 ],
-                // ],
-                // maxBounds: [
-                //     [ 103.6, 1.1704753 ],
-                //     [ 104.1, 1.4754753 ],
-                // ],
+                center: _center,
+                zoom: _zoom,
             }
 
             /* Initialize map object. */
@@ -99,6 +79,14 @@ export default {
                 showCompass: true,
                 showZoom: true,
                 visualizePitch: false,
+            }))
+
+            this.map.addControl(new Mapbox.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+                trackUserLocation: true,
+                showUserHeading: true,
             }))
 
             this.map.on('moveend', async () => {
@@ -123,10 +111,14 @@ export default {
                         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
                     }
 
-                    new Mapbox.Popup()
-                        .setLngLat(coordinates)
-                        .setHTML(description)
-                        .addTo(this.map)
+                    new Mapbox.Popup({
+                        className: 'mapbox-popup',
+                        maxWidth: '320px',
+                        closeButton: false,
+                    })
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(this.map)
                 })
 
                 // inspect a cluster on click
@@ -136,25 +128,30 @@ export default {
                     })
                     // console.log('FEATURES', features)
 
+                    /* Set cluster id. */
                     const clusterId = features[0].properties.cluster_id
 
-                    this.map.getSource('places').getClusterExpansionZoom(
-                        clusterId,
-                        (err, zoom) => {
-                            if (err) return
+                    this.map
+                        .getSource('places')
+                        .getClusterExpansionZoom(
+                            clusterId,
+                            (err, zoom) => {
+                                if (err) return
 
-                            this.map.easeTo({
-                                center: features[0].geometry.coordinates,
-                                zoom: zoom
-                            })
-                        }
-                    )
+                                this.map.easeTo({
+                                    center: features[0].geometry.coordinates,
+                                    zoom: zoom
+                                })
+                            }
+                        )
                 })
 
+                /* Handle mouse enter. */
                 this.map.on('mouseenter', 'clusters', () => {
                     this.map.getCanvas().style.cursor = 'pointer'
                 })
 
+                /* Handle mouse exit. */
                 this.map.on('mouseleave', 'clusters', () => {
                     this.map.getCanvas().style.cursor = ''
                 })
@@ -172,25 +169,25 @@ export default {
             })
         },
 
+        /* Handle zoom update. */
         zoomUpdate(_zoom) {
             this.currentZoom = _zoom
         },
 
+        /* Handle center update. */
         centerUpdate(_center) {
             this.currentCenter = _center
         },
 
+        /* Handle inner click. */
         innerClick() {
-
             alert(`Click!`)
         },
 
         async mapManager() {
             // console.log('MAP MOVED')
 
-            // const bounds = this.map.getBounds()
-            // console.log('BOUNDS', bounds)
-
+            /* Set map bounds. */
             const bounds = {
                 ne: this.map.getBounds()._ne,
                 sw: this.map.getBounds()._sw,
@@ -210,8 +207,9 @@ export default {
                 .set('accept', 'json')
 
             const body = result.body
-            console.log('ATM LOCATIONS (body):', body)
+            // console.log('ATM LOCATIONS (body):', body)
 
+            /* Validate body. */
             if (body) {
                 /* Send vendors back home. */
                 this.$emit('onUpdate', body)
@@ -225,7 +223,7 @@ export default {
                     // console.log('VENUE', venue)
 
                     /* Initialize details. */
-                    let details = ''
+                    let details = '<main class="border-2 border-indigo-200 rounded-xl bg-indigo-50 p-3">'
 
                     /* Validate venue. */
                     if (venue) {
@@ -261,12 +259,12 @@ export default {
                             mapLink = `https://www.google.com/maps/dir/?api=1&travelmode=driving&layer=traffic&destination=${address}`
                         }
 
-                        details += `<div class="details-title">${vendor._source.name || vendor._source.companyName}</div>`
+                        details += `<div class="text-center text-lg text-gray-800 font-extrabold">${vendor._source.name || vendor._source.companyName}</div>`
 
-                        details += `<div class="details-category">${vendor._source.category === 'default' ? 'BUSINESS' : Array.isArray(vendor._source.category) ? vendor._source.category[0].toUpperCase() : vendor._source.category.toUpperCase()}</div>`
+                        details += `<div class="text-right"><span class="text-xs text-gray-500 font-medium">${vendor._source.category === 'default' ? 'BUSINESS' : Array.isArray(vendor._source.category) ? vendor._source.category[0].toUpperCase() : vendor._source.category.toUpperCase()}</span></div>`
 
                         if (address) {
-                            details += `<a href="${mapLink}" target="_blank">${address}</a><br>`
+                            details += `<a class="text-gray-800 font-medium mt-3" href="${mapLink}" target="_blank">${address}</a><br>`
                         }
 
                         if (venue.phone) {
@@ -278,8 +276,10 @@ export default {
                         }
 
                         if (venue.googleBusiness) {
-                            details += `<a href="${venue.googleBusiness}" target="_blank">Google Business (link)</a>`
+                            details += `<div class="text-center"><a class="text-red-500 text-base font-bold" href="${venue.googleBusiness}" target="_blank">Google Business (link)</a></div>`
                         }
+
+                        details += '</main>'
 
                         /* Update details. */
                         // $('div#vendor-details-' + venueid)
@@ -298,8 +298,9 @@ export default {
 
                 })
                 // this.vendors = body
-                console.log('MAPBOX (vendors):', this.vendors)
+                // console.log('MAPBOX (vendors):', this.vendors)
 
+                /* Initialize features. */
                 const features = []
 
                 this.vendors.forEach(_vendor => {
@@ -312,7 +313,6 @@ export default {
                         'geometry': {
                             'type': 'Point',
                             'coordinates': [_vendor.lng, _vendor.lat]
-                            // 'coordinates': [-66.888721, 10.505399]
                         }
                     }
 
@@ -325,7 +325,6 @@ export default {
                 }
 
                 this.updateMap(data)
-
 
             }
 
@@ -440,16 +439,70 @@ export default {
 
     },
     created: function () {
-        //
-        Mapbox.accessToken = this.accessToken
+        /* Set Mapbox access token. */
+        Mapbox.accessToken = MAPBOX_ACCESS_TOKEN
+
     },
     mounted: function () {
-        // NOTE: Wait for map object to become available
-        // this.$nextTick(this.init)
-        // setTimeout(this.init, 10000)
-        this.init()
+        /* Initialize variables. */
+        let center
+        let zoom
 
+        /* Validate start position. */
+        if (this.startPos) {
+            /* Set latitude. */
+            const lat = this.startPos.split(',')[0]
 
+            /* Set longitude. */
+            const lng = this.startPos.split(',')[1]
+
+            /* Set center. */
+            center = [ lng, lat ]
+        }
+
+        if (this.startZoom) {
+            /* Set zoom. */
+            zoom = this.startZoom
+        } else {
+            /* Set zoom. */
+            zoom = 12
+        }
+
+        /* Validate center. */
+        if (center) {
+            this.init(center, zoom)
+        } else {
+            /* Set (geolocation) options. */
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+
+            /* Handle geolocation. */
+            navigator.geolocation.getCurrentPosition(_position => {
+                // console.log('POSITION', _position)
+
+                const lat = _position.coords.latitude
+                // console.log('LAT', lat)
+
+                const lng = _position.coords.longitude
+                // console.log('LNG', lng)
+
+                /* Initialize map. */
+                this.init([ lng, lat ], zoom)
+            }, (_err) => {
+                console.log('LOCATION ERROR', _err)
+
+                if (_err) {
+                    alert(_err.message)
+                }
+
+                /* Initialize map. */
+                // NOTE: Set to Caracas, Venezuela.
+                this.init([ -66.888721, 10.505399 ], zoom)
+            }, options)
+        }
 
     },
 }
@@ -462,5 +515,13 @@ export default {
     width: 32px;
     height: 32px;
     cursor: pointer;
+}
+
+div.mapboxgl-popup-tip: {
+    background-color: #3333FF !important;
+}
+
+div.mapboxgl-popup-content: {
+    background-color: #3399FF !important;
 }
 </style>
