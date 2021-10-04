@@ -98,10 +98,15 @@ export default {
 
             /* Handle loaded map. */
             this.map.on('load', async () => {
-                // When a click event occurs on a feature in the places layer, open a popup at the
+                // When a click event occurs on a feature in the vendors layer, open a popup at the
                 // location of the feature, with description HTML from its properties.
-                // this.map.on('click', 'places', (e) => {
+                // this.map.on('click', 'vendors', (e) => {
                 this.map.on('click', 'unclustered-point', (e) => {
+                    // console.log('CLICKED POINT', e)
+
+                    // const features = this.map.querySourceFeatures('vendors')
+                    // console.log('MAP FEATURES (vendors):', features)
+
                     // Copy coordinates array.
                     const coordinates = e.features[0].geometry.coordinates.slice()
                     const description = e.features[0].properties.description
@@ -135,7 +140,7 @@ export default {
                     const clusterId = features[0].properties.cluster_id
 
                     this.map
-                        .getSource('places')
+                        .getSource('vendors')
                         .getClusterExpansionZoom(
                             clusterId,
                             (err, zoom) => {
@@ -159,7 +164,7 @@ export default {
                     this.map.getCanvas().style.cursor = ''
                 })
 
-                // Change the cursor to a pointer when the mouse is over the places layer.
+                // Change the cursor to a pointer when the mouse is over the vendors layer.
                 this.map.on('mouseenter', 'unclustered-point', () => {
                     this.map.getCanvas().style.cursor = 'pointer'
                 })
@@ -169,8 +174,23 @@ export default {
                     this.map.getCanvas().style.cursor = ''
                 })
 
-                /* Manage map. */
-                this.mapManager()
+                /* Load image. */
+                // this.map.loadImage('https://i.imgur.com/CvdwMwu.png', // BCH icon 40 px
+                this.map.loadImage('https://i.imgur.com/9zOS6wv.png', // BCH icon 32 px
+                    (_error, _image) => {
+                        console.log('ERROR', _error)
+                        console.log('IMAGE', _image)
+
+                        if (_error) throw _error
+
+                        /* Add ATM marker. */
+                        this.map.addImage('bch-marker', _image)
+
+                        /* Manage map. */
+                        this.mapManager()
+                    }
+                )
+
             })
         },
 
@@ -350,11 +370,12 @@ export default {
          * Set map sources, markers and layers.
          */
         updateMap(_data) {
+            // console.log('LOAD IMAGE', img)
             // const bounds = this.map.getBounds()
             // console.log('BOUNDS', bounds)
 
             /* Set source. */
-            const source = this.map.getSource('places')
+            const source = this.map.getSource('vendors')
 
             /* Validate source. */
             if (source) {
@@ -382,7 +403,7 @@ export default {
             const clusterRadius = 50
 
             /* Add (new) source. */
-            this.map.addSource('places', {
+            this.map.addSource('vendors', {
                 // This GeoJSON contains features that include an "icon"
                 // property. The value of the "icon" property corresponds
                 // to an image in the Mapbox Streets style's sprite.
@@ -393,28 +414,10 @@ export default {
                 clusterRadius,
             })
 
-            // Add a layer showing the places.
-            // this.map.addLayer({
-            //     'id': 'places',
-            //     // 'type': 'symbol',
-            //     'type': 'circle',
-            //     'source': 'places',
-            //     // 'layout': {
-            //     //     'icon-image': '{icon}',
-            //     //     'icon-allow-overlap': true
-            //     // },
-            //     'paint': {
-            //     'circle-radius': 12,
-            //     'circle-stroke-width': 2,
-            //     'circle-color': '#FF6969',
-            //     'circle-stroke-color': '#FF3333'
-            //     }
-            // })
-
             this.map.addLayer({
                 id: 'clusters',
                 type: 'circle',
-                source: 'places',
+                source: 'vendors',
                 filter: ['has', 'point_count'],
                 paint: {
                     // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
@@ -428,7 +431,7 @@ export default {
                         '#51bbd6',
                         100,
                         '#f1f075',
-                        750,
+                        500,
                         '#f28cb1'
                     ],
                     'circle-radius': [
@@ -446,7 +449,7 @@ export default {
             this.map.addLayer({
                 id: 'cluster-count',
                 type: 'symbol',
-                source: 'places',
+                source: 'vendors',
                 filter: ['has', 'point_count'],
                 layout: {
                     'text-field': '{point_count_abbreviated}',
@@ -455,16 +458,27 @@ export default {
                 }
             })
 
+            // this.map.addLayer({
+            //     id: 'unclustered-point',
+            //     type: 'circle',
+            //     source: 'vendors',
+            //     filter: ['!', ['has', 'point_count']],
+            //     paint: {
+            //         'circle-color': '#11b4da',
+            //         'circle-radius': 12,
+            //         'circle-stroke-width': 1,
+            //         'circle-stroke-color': '#fff'
+            //     }
+            // })
+
             this.map.addLayer({
                 id: 'unclustered-point',
-                type: 'circle',
-                source: 'places',
+                type: 'symbol',
+                source: 'vendors',
                 filter: ['!', ['has', 'point_count']],
-                paint: {
-                    'circle-color': '#11b4da',
-                    'circle-radius': 12,
-                    'circle-stroke-width': 1,
-                    'circle-stroke-color': '#fff'
+                layout: {
+                    'icon-image': 'bch-marker',
+                    'icon-allow-overlap': true,
                 }
             })
 
