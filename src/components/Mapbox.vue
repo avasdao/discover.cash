@@ -28,7 +28,11 @@ export default {
     },
     watch: {
         startPos: function (_latlng) {
-            console.log('I JUST SAW THE COORDS CHANGE:', _latlng)
+            // console.log('I JUST SAW THE COORDS CHANGE:', _latlng)
+
+            if (!_latlng) {
+                return console.error('NO coordinates', _latlng)
+            }
 
             /* Set latitude. */
             const lat = _latlng.split(',')[0]
@@ -238,7 +242,7 @@ export default {
                 .set('accept', 'json')
 
             const body = result.body
-            // console.log('ATM LOCATIONS (body):', body)
+            // console.log('VENDOR LOCATIONS (body):', body)
 
             /* Validate body. */
             if (body) {
@@ -496,6 +500,8 @@ export default {
         let zoom
 
         /* Validate start position. */
+        console.log('MAP (startPos):', this.startPos)
+
         if (this.startPos) {
             /* Set latitude. */
             const lat = this.startPos.split(',')[0]

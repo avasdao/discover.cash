@@ -1,6 +1,7 @@
 <template>
-    <main>
+    <main class="w-full">
         <input
+            class="w-full h-12 border-0 border-b-2 border-blue-600 bg-blue-400 text-white"
             type="text"
             @change="onChange"
             @keydown="onKeyDown"
@@ -8,17 +9,21 @@
             placeholder="search for Bitcoin Cash merchants by name, location or type of business"
         />
 
-        <ul v-if="filteredSuggestions" class="suggestions">
+        <ul
+            v-if="filteredSuggestions && filteredSuggestions.length"
+            class="border-r-4 border-b-4 border-gray-500 w-96 overflow-hidden rounded-br-xl"
+        >
             <li
+                class="p-1 bg-gray-50 cursor-pointer "
                 v-for="(suggestion, index) of filteredSuggestions"
                 :key="suggestion"
-                :class="{ 'suggestion-active': index === activeSuggestion }"
+                :class="{ 'bg-indigo-500 hover:bg-indigo-700 text-white font-extrabold': index === activeSuggestion, 'hover:bg-gray-300 hover:font-bold border-gray-500 border-t-2': index !== activeSuggestion }"
                 @click="onClick(suggestion)"
             >
                 {{suggestion}}
             </li>
         </ul>
-        <div v-if="!filteredSuggestions" class="no-suggestions">
+        <div v-if="!filteredSuggestions" class="bg-pink-800">
             <em>No suggestions available.</em>
         </div>
 
@@ -163,58 +168,10 @@ export default {
 </script>
 
 <style scoped>
-input {
-    border-top-style: hidden;
-    border-right-style: hidden;
-    border-left-style: hidden;
-    border-bottom-style: hidden;
-
-    width: calc(100% - 30px);
-    height: 40px;
-
-    padding: 5px 15px;
-
-    font-size: 1.2em;
-
-    background-color: rgba(30, 120, 210, 0.8);
-    color: rgba(255, 255, 255, 1.0);
-}
 input::placeholder {
     color: rgba(255, 255, 255, 1.0);
 }
 input:focus {
     outline: none;
-}
-
-.no-suggestions {
-    color: #999;
-    padding: 0.5rem;
-}
-
-.suggestions {
-    border: 1px solid #999;
-    border-top-width: 0;
-    list-style: none;
-    margin-top: 0;
-    max-height: 143px;
-    overflow-y: auto;
-    padding-left: 0;
-    width: calc(300px + 1rem);
-}
-
-.suggestions li {
-    padding: 0.5rem;
-}
-
-.suggestion-active,
-.suggestions li:hover {
-    background-color: #008f68;
-    color: #fae042;
-    cursor: pointer;
-    font-weight: 700;
-}
-
-.suggestions li:not(:last-of-type) {
-    border-bottom: 1px solid #999;
 }
 </style>

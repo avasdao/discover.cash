@@ -99,9 +99,14 @@ export default {
                 this.suggestion = _selected.suggestion
                 // console.log('HANDLING (suggestion):', this.suggestion)
 
-                if (_selected.vendor) {
+                if (_selected.vendor.lat && _selected.vendor.lon) {
                     this.lat = _selected.vendor.lat
                     this.lng = _selected.vendor.lon
+                }
+
+                if (_selected.vendor.lat && _selected.vendor.lng) {
+                    this.lat = _selected.vendor.lat
+                    this.lng = _selected.vendor.lng
                 }
             }
         },
@@ -128,6 +133,9 @@ export default {
         this.vendors = []
 
         this.isEmbedded = false
+
+        this.lat = 10.505399
+        this.lng = -66.888721
 
         this.init()
     },
