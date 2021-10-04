@@ -1,44 +1,35 @@
 <template>
-    <main>
-        <div>
-            Copyright &copy; 2021 <a href="https://panmoni.com" target="_blank">Panmoni</a>. All rights reserved.
+    <main class="bg-gray-200 flex justify-between px-2 border-t-2 border-b-2 border-gray-400">
+        <div class="text-xs text-gray-500 text-center sm:text-left w-full sm:w-1/2">
+            Copyright &copy; {{curYear}}
+            <a class="text-red-500" href="https://panmoni.com" target="_blank">Panmoni</a>.
+            All rights reserved.
         </div>
 
-        <div>
-            <a href="https://github.com/Panmoni/discover-cash" target="_blank">Source</a> maintained by <a href="https://modenero.com" target="_blank">Modenero</a>
+        <div class="hidden sm:block text-xs text-gray-500">
+            <a class="text-red-500" href="https://github.com/Panmoni/discover-cash" target="_blank">
+                Source
+            </a>
+            maintained by
+            <a class="text-red-500" href="https://modenero.com" target="_blank">
+                Modenero
+            </a>
         </div>
     </main>
 </template>
 
 <script>
+/* Import modules. */
+import moment from 'moment'
+
 export default {
-    props: {
-        msg: String
+    data: () => {
+        return {
+            curYear: null,
+        }
+    },
+    created: function () {
+        this.curYear = moment().format('YYYY')
     }
 }
 </script>
-
-<style scoped>
-main {
-    display: flex;
-    justify-content: space-between;
-
-    width: calc(100% - 10px);
-    padding: 2px 5px;
-
-    font-size: 0.8em;
-
-    border-top: 1pt solid rgba(120, 120, 120, 0.5);
-    border-bottom: 1pt solid rgba(120, 120, 120, 0.5);
-    background-color: rgba(210, 210, 255, 0.3);
-}
-@media only screen and (max-device-width: 480px) {
-    main {
-        display: block;
-    }
-}
-a {
-    text-decoration: none;
-    color: rgba(210, 30, 30, 1.0);
-}
-</style>
