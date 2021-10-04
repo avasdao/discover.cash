@@ -1,54 +1,56 @@
 <template>
-    <main>
+    <main role="list" class="divide-y divide-gray-200 flex flex-col items-center px-5 pb-5">
         <div
             v-for="vendor of activeVendors"
             :key="vendor.id"
-            class="vendor-results"
+            class="px-4 py-4 bg-gray-200 border-2 border-gray-400 w-full sm:w-3/4 rounded-xl mt-5 sm:mt-10"
         >
 
-            <h3>{{vendor.name || vendor.companyName}}</h3>
+            <h3 class="text-2xl font-bold text-center">
+                {{vendor.name || vendor.companyName}}
+            </h3>
 
-            <div v-if="vendor.description" class="vendor-results-description">
+            <div v-if="vendor.type" class="text-right text-sm">
+                {{displayType(vendor)}}
+            </div>
+
+            <div v-if="vendor.category" class="text-right text-sm">
+                {{displayCategory(vendor)}}
+            </div>
+
+            <div v-if="vendor.description" class="p-3">
                 {{vendor.description}}
             </div>
 
-            <div v-if="vendor.type">
-                Type: {{displayType(vendor)}}
+            <div v-if="vendor.neighborhood" class="text-lg font-bold text-center">
+                {{vendor.neighborhood}}
             </div>
 
-            <div v-if="vendor.category">
-                Category: {{displayCategory(vendor)}}
+            <div v-if="vendor.streetAddress" class="px-3">
+                {{vendor.streetAddress}}
             </div>
 
-            <div v-if="vendor.streetAddress">
-                Address: {{vendor.streetAddress}}
+            <div v-if="vendor.houseno && vendor.street" class="px-3">
+                {{vendor.houseno}} {{vendor.street}}
             </div>
 
-            <div v-if="vendor.houseno && vendor.street">
-                Address: {{vendor.houseno}} {{vendor.street}}
-            </div>
-
-            <div v-if="vendor.neighborhood">
-                Neighborhood: {{vendor.neighborhood}}
-            </div>
-
-            <div v-if="vendor.city && vendor.state && vendor.country">
+            <div v-if="vendor.city && vendor.state && vendor.country" class="px-3">
                 {{vendor.city}}, {{vendor.state}}, {{vendor.country}}
             </div>
 
-            <div v-if="vendor.phone">
+            <div v-if="vendor.phone" class="px-3">
                 Phone: {{vendor.phone}}
             </div>
 
-            <div v-if="vendor.website">
+            <div v-if="vendor.website" class="px-3">
                 <a :href="vendor.website" target="_blank">{{vendor.website}}</a>
             </div>
 
-            <div v-if="vendor.googleBusiness">
+            <div v-if="vendor.googleBusiness" class="flex justify-center text-red-500 text-lg font-bold p-3">
                 <a :href="vendor.googleBusiness" target="_blank">Google Business (link)</a>
             </div>
 
-            <div v-if="vendor.opening_hours">
+            <div v-if="vendor.opening_hours" class="p-3">
                 {{vendor.opening_hours}}
             </div>
 
@@ -177,22 +179,6 @@ export default {
 </script>
 
 <style scoped>
-main {
-    /* border: 1pt solid blue; */
-    width: 100%;
-    /* height: 60px; */
-}
-
-.vendor-results {
-    border-bottom: 2pt solid #aaa;
-    padding: 15px;
-
-    text-align: center;
-}
-.vendor-results-description {
-    padding-left: 75px;
-    padding-right: 75px;
-}
 
 .show-more {
     display: flex;
