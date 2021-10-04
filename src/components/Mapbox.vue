@@ -105,7 +105,35 @@ export default {
                 // When a click event occurs on a feature in the vendors layer, open a popup at the
                 // location of the feature, with description HTML from its properties.
                 // this.map.on('click', 'vendors', (e) => {
-                this.map.on('click', 'unclustered-point', (e) => {
+                this.map.on('click', 'unclustered-atm-point', (e) => {
+                    // console.log('CLICKED POINT', e)
+
+                    // const features = this.map.querySourceFeatures('vendors')
+                    // console.log('MAP FEATURES (vendors):', features)
+
+                    // Copy coordinates array.
+                    const coordinates = e.features[0].geometry.coordinates.slice()
+                    const description = e.features[0].properties.description
+
+                    // Ensure that if the map is zoomed out such that multiple
+                    // copies of the feature are visible, the popup appears
+                    // over the copy being pointed to.
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+                    }
+
+                    /* Add popup. */
+                    new Mapbox.Popup({
+                        className: 'mapbox-popup',
+                        maxWidth: '320px',
+                        closeButton: false,
+                    })
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(this.map)
+                })
+
+                this.map.on('click', 'unclustered-bch-point', (e) => {
                     // console.log('CLICKED POINT', e)
 
                     // const features = this.map.querySourceFeatures('vendors')
@@ -169,29 +197,52 @@ export default {
                 })
 
                 // Change the cursor to a pointer when the mouse is over the vendors layer.
-                this.map.on('mouseenter', 'unclustered-point', () => {
+                this.map.on('mouseenter', 'unclustered-atm-point', () => {
+                    this.map.getCanvas().style.cursor = 'pointer'
+                })
+                this.map.on('mouseenter', 'unclustered-bch-point', () => {
                     this.map.getCanvas().style.cursor = 'pointer'
                 })
 
                 // Change it back to a pointer when it leaves.
-                this.map.on('mouseleave', 'unclustered-point', () => {
+                this.map.on('mouseleave', 'unclustered-atm-point', () => {
+                    this.map.getCanvas().style.cursor = ''
+                })
+                this.map.on('mouseleave', 'unclustered-bch-point', () => {
                     this.map.getCanvas().style.cursor = ''
                 })
 
                 /* Load image. */
-                // this.map.loadImage('https://i.imgur.com/CvdwMwu.png', // BCH icon 40 px
-                this.map.loadImage('https://i.imgur.com/9zOS6wv.png', // BCH icon 32 px
+                this.map.loadImage('https://i.imgur.com/A9jVeq1.png', // ATM icon 32 px
                     (_error, _image) => {
-                        console.log('ERROR', _error)
-                        console.log('IMAGE', _image)
+                        // console.log('ERROR', _error)
+                        // console.log('IMAGE', _image)
 
                         if (_error) throw _error
 
                         /* Add ATM marker. */
-                        this.map.addImage('bch-marker', _image)
+                        this.map.addImage('atm-marker', _image)
 
                         /* Manage map. */
-                        this.mapManager()
+                        // this.mapManager()
+
+                        // this.map.loadImage('https://i.imgur.com/CvdwMwu.png', // BCH icon 40 px
+                        this.map.loadImage('https://i.imgur.com/9zOS6wv.png', // BCH icon 32 px
+                            (_error, _image) => {
+                                // console.log('ERROR', _error)
+                                // console.log('IMAGE', _image)
+
+                                if (_error) throw _error
+
+                                /* Add ATM marker. */
+                                this.map.addImage('bch-marker', _image)
+
+                                /* Manage map. */
+                                this.mapManager()
+                            }
+                        )
+
+
                     }
                 )
 
@@ -344,6 +395,7 @@ export default {
                     const feature = {
                         'type': 'Feature',
                         'properties': {
+                            'category': _vendor.cat,
                             'description': _vendor.details,
                         },
                         'geometry': {
@@ -476,10 +528,27 @@ export default {
             // })
 
             this.map.addLayer({
-                id: 'unclustered-point',
+                id: 'unclustered-atm-point',
                 type: 'symbol',
                 source: 'vendors',
-                filter: ['!', ['has', 'point_count']],
+                filter: ['all',
+                    ['!', ['has', 'point_count']],
+                    ['==', ['get', 'category'], 'atm'],
+                ],
+                layout: {
+                    'icon-image': 'atm-marker',
+                    'icon-allow-overlap': true,
+                }
+            })
+
+            this.map.addLayer({
+                id: 'unclustered-bch-point',
+                type: 'symbol',
+                source: 'vendors',
+                filter: ['all',
+                    ['!', ['has', 'point_count']],
+                    ['!=', ['get', 'category'], 'atm'],
+                ],
                 layout: {
                     'icon-image': 'bch-marker',
                     'icon-allow-overlap': true,
@@ -500,8 +569,6 @@ export default {
         let zoom
 
         /* Validate start position. */
-        console.log('MAP (startPos):', this.startPos)
-
         if (this.startPos) {
             /* Set latitude. */
             const lat = this.startPos.split(',')[0]

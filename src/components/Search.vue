@@ -1,7 +1,7 @@
 <template>
     <main class="w-full">
         <input
-            class="w-full h-12 border-0 border-b-2 border-blue-600 bg-blue-400 text-white"
+            class="w-full h-12 border-0 border-b-2 border-blue-600 bg-blue-400 text-white text-lg font-bold"
             type="text"
             @change="onChange"
             @keydown="onKeyDown"
