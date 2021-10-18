@@ -350,19 +350,19 @@ export default {
                         details += `<div class="text-right"><span class="text-xs text-gray-500 font-medium">${vendor._source.category === 'default' ? 'BUSINESS' : Array.isArray(vendor._source.category) ? vendor._source.category[0].toUpperCase() : vendor._source.category.toUpperCase()}</span></div>`
 
                         if (address) {
-                            details += `<a class="text-red-500 font-medium mt-3" href="${mapLink}" target="_blank">${address}</a><br>`
+                            details += `<a class="text-blue-500 font-medium mt-3" href="${mapLink}" target="_blank">${address}</a><br>`
                         }
 
                         if (venue.phone) {
-                            details += `<a class="text-red-500" href="tel:${venue.phone}">${venue.phone}</a><br>`
+                            details += `<a class="text-blue-500" href="tel:${venue.phone}">${venue.phone}</a><br>`
                         }
 
                         if (venue.email) {
-                            details += `<a class="text-red-500" href="mailto:${venue.email}">${venue.email}</a><br>`
+                            details += `<a class="text-blue-500" href="mailto:${venue.email}">${venue.email}</a><br>`
                         }
 
                         if (venue.googleBusiness) {
-                            details += `<div class="text-center"><a class="text-red-500 text-base font-bold" href="${venue.googleBusiness}" target="_blank">Google Business (link)</a></div>`
+                            details += `<div class="text-center"><a class="text-blue-500 text-base font-bold" href="${venue.googleBusiness}" target="_blank">Google Business (link)</a></div>`
                         }
 
                         details += '</main>'
@@ -587,6 +587,8 @@ export default {
             /* Set zoom. */
             zoom = 12
         }
+
+        console.log('CENTER', center)
 
         /* Validate center. */
         if (center) {
