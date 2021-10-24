@@ -46,7 +46,7 @@
                 <a :href="vendor.website" target="_blank">{{vendor.website}}</a>
             </div>
 
-            <div v-if="vendor.googleBusiness" class="flex justify-center text-blue-500 text-lg font-bold p-3">
+            <div v-if="vendor.googleBusiness" class="flex justify-center text-blue-500 hover:underline text-lg font-bold p-3">
                 <a :href="vendor.googleBusiness" target="_blank">Google Business (link)</a>
             </div>
 
