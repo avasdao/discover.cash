@@ -134,8 +134,6 @@ export default {
 
         this.isEmbedded = false
 
-        // this.lat = 10.505399     // Caracas, Venezuela
-        // this.lng = -66.888721    // Caracas, Venezuela
         // this.lat = 40.7579747       // Times Square, New York
         // this.lng = -73.9877366      // Times Square, New York
 
