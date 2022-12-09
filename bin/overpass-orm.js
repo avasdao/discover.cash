@@ -93,13 +93,20 @@ const runOverpass = async () => {
     let response
     let url
 
+    const south = 26.603262883631
+    const west = -84.633178710937
+    const north = 29.91685223307
+    const east = -80.167236328125
+
     const OVERPASS_ENDPOINT = 'http://overpass-api.de/api/interpreter'
     const DATA_FORMAT = 'json'
     const TIMEOUT_SECONDS = 25
-    const NODE_BCH = `node["currency:BCH"="yes"](26.603262883631,-84.633178710937,29.91685223307,-80.167236328125);`
+    const NODE_CURRENCY = `node["currency:BCH"="yes"](${south},${west},${north},${east})`
+    const NODE_PAYMENT = `node["payment:bitcoincash"="yes"](${south},${west},${north},${east})`
 
     /* Build request URL. */
-    url = `${OVERPASS_ENDPOINT}?data=[out:${DATA_FORMAT}][timeout:${TIMEOUT_SECONDS}];(${NODE_BCH}<;rel(br););out meta;`
+    url = `${OVERPASS_ENDPOINT}?data=[out:${DATA_FORMAT}][timeout:${TIMEOUT_SECONDS}];(${NODE_CURRENCY};<;rel(br););out meta;`
+    // url = `${OVERPASS_ENDPOINT}?data=[out:${DATA_FORMAT}][timeout:${TIMEOUT_SECONDS}];(${NODE_CURRENCY};${NODE_PAYMENT};<;rel(br););out meta;`
 
     /* Request coinmap venues. */
     response = await superagent

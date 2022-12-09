@@ -69,10 +69,6 @@ app.get('/v1/search/:index/:query', require('./routes/search'))
 app.get('/v1/search/:query', require('./routes/search'))
 app.post('/v1/search/map', require('./routes/mapBounds'))
 
-/* Initialize Magic (Email) Link route. */
-// app.get('/v1/magiclink', require('./routes/magiclink'))
-app.post('/v1/magiclink', require('./routes/magiclink'))
-
 /* Initialize media. */
 app.get('/v1/media/:mediaid', require('./routes/media'))
 

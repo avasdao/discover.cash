@@ -6,7 +6,7 @@
             @change="onChange"
             @keydown="onKeyDown"
             v-model="userInput"
-            placeholder="search for Bitcoin Cash merchants by name, location or type of business"
+            placeholder="search for Crypto merchants by name, location or type of business"
         />
 
         <ul
