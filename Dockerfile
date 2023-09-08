@@ -8,8 +8,9 @@ COPY package.json /usr/src/app/package.json
 RUN yarn install --silent
 
 COPY . /usr/src/app
-RUN yarn run build
+# RUN yarn run build
 
-EXPOSE 3000
+EXPOSE 8080
 
-CMD ["node", ".output/server/index.mjs"]
+# CMD ["node", ".output/server/index.mjs"]
+RUN yarn run serve
