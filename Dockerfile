@@ -13,4 +13,4 @@ COPY . /usr/src/app
 EXPOSE 8080
 
 # CMD ["node", ".output/server/index.mjs"]
-RUN yarn run serve
+CMD yarn run serve
